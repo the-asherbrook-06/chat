@@ -1,4 +1,5 @@
 // packages
+import 'package:chat/components/QuotesContainer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,7 @@ class _ProfilePageState extends State<ProfilePage> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: [
-          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedBubbleChat), label: "chat"),
+          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedComment01), label: "chat"),
           BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUserGroup02), label: "group"),
           BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUser02), label: "group"),
         ],
@@ -87,6 +88,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
+            SizedBox(height: 4),
+            QuotesContainer(),
           ],
         ),
       ),

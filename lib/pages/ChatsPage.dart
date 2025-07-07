@@ -26,9 +26,7 @@ class _ChatsPageState extends State<ChatsPage> {
         backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
         title: Text("Chats"),
         actions: [
-          IconButton(onPressed: () {
-
-          }, icon: Icon(HugeIcons.strokeRoundedPencilEdit02)),
+          IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedPencilEdit02)),
           IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedMoreVerticalCircle01)),
         ],
       ),
@@ -38,7 +36,7 @@ class _ChatsPageState extends State<ChatsPage> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: [
-          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedBubbleChat), label: "chat"),
+          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedComment01), label: "chat"),
           BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUserGroup02), label: "group"),
           BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUser02), label: "group"),
         ],
@@ -56,11 +54,12 @@ class _ChatsPageState extends State<ChatsPage> {
                     "Start a chat to see messages here",
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
+                  SizedBox(height: 24),
                 ],
               ),
             )
           : ListView(children: []),
-          // TODO: Make into a ListView.builder()
+      // TODO: Make into a ListView.builder()
     );
   }
 }

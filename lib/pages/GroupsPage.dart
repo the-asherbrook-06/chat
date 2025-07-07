@@ -36,7 +36,7 @@ class _GroupsPageState extends State<GroupsPage> {
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: [
-          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedBubbleChat), label: "chat"),
+          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedComment01), label: "chat"),
           BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUserGroup02), label: "group"),
           BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUser02), label: "group"),
         ],
@@ -57,6 +57,7 @@ class _GroupsPageState extends State<GroupsPage> {
                     "Start a chat to see messages here",
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
+                  SizedBox(height: 24),
                 ],
               ),
             )
