@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "340853803097",
+    "project_id": "app-asher-chat",
+    "storage_bucket": "app-asher-chat.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:340853803097:android:b81980efbd5a2e7a810948",
+        "android_client_info": {
+          "package_name": "app.asher.chat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjDXmuaO36VdVUzwCDe_vf9iBMvE6_SpI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
