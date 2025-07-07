@@ -24,7 +24,7 @@ class _SplashPageState extends State<SplashPage> {
       if (!mounted) return;
       log(user.toString());
       (user != null)
-          ? Navigator.pushNamedAndRemoveUntil(context, "/chats", (route) => false)
+          ? Navigator.pushNamedAndRemoveUntil(context, "/dashboard", (route) => false)
           : Navigator.pushNamedAndRemoveUntil(context, "/", (route) => false);
     });
   }

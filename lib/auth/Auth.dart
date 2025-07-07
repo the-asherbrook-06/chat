@@ -20,7 +20,7 @@ class Auth {
       await userCredential.user!.reload();
 
       log("[Auth] User registered and displayName set: ${_auth.currentUser?.displayName}");
-      Navigator.pushNamedAndRemoveUntil(context, "/chats", (context) => false);
+      Navigator.pushNamedAndRemoveUntil(context, "/dashboard", (context) => false);
     } catch (e) {
       log("[Auth] Registration error: $e");
     }
@@ -30,7 +30,7 @@ class Auth {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       log("[Auth] User logged in successfully!");
-      Navigator.pushNamedAndRemoveUntil(context, "/chats", (context) => false);
+      Navigator.pushNamedAndRemoveUntil(context, "/dashboard", (context) => false);
     } catch (e) {
       log("[Auth] Login error: $e");
     }
@@ -46,7 +46,7 @@ class Auth {
     final user = _auth.currentUser;
     if (user != null) {
       log("[Auth] User is already logged in!");
-      Navigator.pushNamedAndRemoveUntil(context, "/chats", (context) => false);
+      Navigator.pushNamedAndRemoveUntil(context, "/dashboard", (context) => false);
     } else {
       log("[Auth] No user logged in.");
     }

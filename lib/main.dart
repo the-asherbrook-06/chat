@@ -8,9 +8,7 @@ import 'pages/SplashPage.dart';
 import 'pages/WelcomePage.dart';
 import 'pages/RegisterPage.dart';
 import 'pages/LoginPage.dart';
-import 'pages/ChatsPage.dart';
-import 'pages/GroupsPage.dart';
-import 'pages/ProfilePage.dart';
+import 'pages/Dashboard.dart';
 
 // themes
 import 'themes/theme.dart';
@@ -45,9 +43,7 @@ class Chat extends StatelessWidget {
         '/splash': (context) => const SplashPage(),
         '/register': (context) => const RegisterPage(),
         '/login': (context) => const LoginPage(),
-        '/chats': (context) => const ChatsPage(),
-        '/groups': (context) => const GroupsPage(),
-        '/profile': (context) => const ProfilePage(),
+        '/dashboard': (context) => const Dashboard(),
       },
     );
   }
