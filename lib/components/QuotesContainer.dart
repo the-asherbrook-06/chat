@@ -35,10 +35,10 @@ class _QuotesContainerState extends State<QuotesContainer> {
         color: Theme.of(context).colorScheme.surfaceContainer,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(12),
         child: Center(
           child: body == null
-              ? CircularProgressIndicator()
+              ? SizedBox(height: 24, width: 24, child: CircularProgressIndicator())
               : Padding(
                   padding: const EdgeInsets.all(8),
                   child: Column(

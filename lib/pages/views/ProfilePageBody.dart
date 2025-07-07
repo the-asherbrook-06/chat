@@ -1,7 +1,6 @@
 // packages
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer';
 
 // auth
 import '../../auth/Auth.dart';
@@ -25,8 +24,6 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
   void initState() {
     super.initState();
     user = auth.getUserData();
-    // TODO: Remove Log
-    log(user.toString());
   }
   @override
   Widget build(BuildContext context) {
