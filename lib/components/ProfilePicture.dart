@@ -13,7 +13,7 @@ class ProfilePicture extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
-      borderRadius: BorderRadiusGeometry.circular(radius),
+      borderRadius: BorderRadius.circular(radius),
       child: Container(
         height: radius * 2,
         width: radius * 2,

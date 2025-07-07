@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 
 class QuotesContainer extends StatefulWidget {
-  QuotesContainer({super.key});
+  const QuotesContainer({super.key});
 
   @override
   State<QuotesContainer> createState() => _QuotesContainerState();
@@ -46,6 +46,7 @@ class _QuotesContainerState extends State<QuotesContainer> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("${body?['quote']}", style: Theme.of(context).textTheme.bodyLarge),
+                      SizedBox(height: 4),
                       Text("— ${body?['author']}", style: Theme.of(context).textTheme.labelLarge),
                     ],
                   ),

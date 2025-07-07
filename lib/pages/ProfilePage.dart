@@ -1,5 +1,4 @@
 // packages
-import 'package:chat/components/QuotesContainer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +7,8 @@ import 'dart:developer';
 // auth
 import '../auth/Auth.dart';
 
-// components
-import '../components/ProfilePicture.dart';
+// body
+import 'package:chat/pages/views/ProfilePageBody.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -56,43 +55,9 @@ class _ProfilePageState extends State<ProfilePage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8),
-        child: ListView(
-          children: [
-            SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  children: [
-                    ProfilePicture(user: user, radius: 60),
-                    SizedBox(height: 16),
-                    Text(
-                      user?.displayName ?? "",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                    ),
-                    Text(user!.email ?? "Email", style: Theme.of(context).textTheme.bodyLarge),
-                    Text(
-                      user!.uid,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    SizedBox(height: 14),
-                    TextButton(onPressed: () {}, child: Text("Edit Profile")),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(height: 4),
-            QuotesContainer(),
-          ],
-        ),
-      ),
+        padding: const EdgeInsets.all(8.0),
+        child: ProfilePageBody(),
+      )
     );
   }
 }
