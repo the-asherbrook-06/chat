@@ -1,4 +1,5 @@
 // packages
+import 'package:chat/pages/appbars/ProfilePageAppBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
@@ -33,16 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-        title: Text("Profile"),
-        actions: [
-          IconButton(
-            onPressed: () => auth.logout(context),
-            icon: Icon(HugeIcons.strokeRoundedLogout01, color: Theme.of(context).colorScheme.error),
-          ),
-        ],
-      ),
+      appBar: ProfilePageAppBar(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 2,
         onTap: (value) => Navigator.pushReplacementNamed(context, _pages[value]),

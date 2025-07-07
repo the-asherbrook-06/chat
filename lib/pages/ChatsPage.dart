@@ -1,4 +1,5 @@
 // packages
+import 'package:chat/pages/appbars/ChatsPageAppBar.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
@@ -19,14 +20,7 @@ class _ChatsPageState extends State<ChatsPage> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-        title: Text("Chats"),
-        actions: [
-          IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedPencilEdit02)),
-          IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedMoreVerticalCircle01)),
-        ],
-      ),
+      appBar: ChatsPageAppBar(),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: 0,
         onTap: (value) => Navigator.pushReplacementNamed(context, _pages[value]),
