@@ -22,7 +22,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   User? user;
 
   void submitForm() async {
-    if(_formKey.currentState!.validate()) {
+    if (_formKey.currentState!.validate()) {
       await auth.setName(_nameController.text);
       Navigator.pop(context);
     }
@@ -55,7 +55,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      await auth.updateProfilePicture(context);
+                      setState(() {
+                        user = auth.getUserData();
+                      });
+                    },
                     icon: ProfilePicture(user: user, radius: 60),
                   ),
                 ],

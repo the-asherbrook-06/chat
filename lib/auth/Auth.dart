@@ -1,9 +1,13 @@
 // packages
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'dart:developer';
+import 'dart:io';
 
 class Auth {
+  final _storage = FirebaseStorage.instance;
   final _auth = FirebaseAuth.instance;
 
   User? getUserData() {
@@ -19,6 +23,26 @@ class Auth {
     } else {
       log("[Auth] No user is signed in to update name.");
     }
+  }
+
+  Future<void> updateProfilePicture(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile == null) return;
+
+    final File file = File(pickedFile.path);
+    final user = _auth.currentUser;
+
+    if (user == null) return;
+
+    final ref = _storage.ref().child("userData/${user.uid}/profilePicture.jpg");
+    await ref.putFile(file);
+    final downloadUrl = await ref.getDownloadURL();
+
+    await user.updatePhotoURL(downloadUrl);
+    await user.reload();
+    log("[Auth] Profile picture updated: $downloadUrl");
   }
 
   Future<void> register(BuildContext context, String name, String email, String password) async {
