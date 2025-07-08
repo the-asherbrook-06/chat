@@ -1,14 +1,14 @@
 // packages
-import 'package:chat/pages/appbars/ChatsPageAppBar.dart';
-import 'package:chat/pages/appbars/GroupsPageAppBar.dart';
-import 'package:chat/pages/appbars/ProfilePageAppBar.dart';
+import 'package:chat/appbars/ChatsPageAppBar.dart';
+import 'package:chat/appbars/GroupsPageAppBar.dart';
+import 'package:chat/appbars/ProfilePageAppBar.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
 // body
-import './views/ProfilePageBody.dart';
-import './views/GroupsPageBody.dart';
-import './views/ChatPageBody.dart';
+import '../views/ProfilePageBody.dart';
+import '../views/GroupsPageBody.dart';
+import '../views/ChatPageBody.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});

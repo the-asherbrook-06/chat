@@ -19,7 +19,7 @@ class _SplashPageState extends State<SplashPage> {
 
   Future<void> _navigateBasedOnAuth() async {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(Duration(milliseconds: 300));
+      // await Future.delayed(Duration(milliseconds: 300));
       final user = FirebaseAuth.instance.currentUser;
       if (!mounted) return;
       log(user.toString());

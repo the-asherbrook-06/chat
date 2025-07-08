@@ -10,6 +10,17 @@ class Auth {
     return _auth.currentUser;
   }
 
+  Future<void> setName(String name) async {
+    User? user = _auth.currentUser;
+    if (user != null) {
+      await user.updateDisplayName(name);
+      await user.reload();
+      log("[Auth] Display name updated to: ${user.displayName}");
+    } else {
+      log("[Auth] No user is signed in to update name.");
+    }
+  }
+
   Future<void> register(BuildContext context, String name, String email, String password) async {
     try {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(

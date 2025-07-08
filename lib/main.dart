@@ -1,4 +1,5 @@
 // packages
+import 'package:chat/pages/EditProfilePage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'firebase_options.dart';
@@ -44,6 +45,7 @@ class Chat extends StatelessWidget {
         '/register': (context) => const RegisterPage(),
         '/login': (context) => const LoginPage(),
         '/dashboard': (context) => const Dashboard(),
+        '/editProfile': (context) => const EditProfilePage(),
       },
     );
   }

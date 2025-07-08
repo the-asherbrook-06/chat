@@ -1,13 +1,14 @@
 // packages
+import 'dart:developer';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // auth
-import '../../auth/Auth.dart';
+import '../auth/Auth.dart';
 
 // components
-import '../../components/ProfilePicture.dart';
-import '../../components/QuotesContainer.dart';
+import '../components/ProfilePicture.dart';
+import '../components/QuotesContainer.dart';
 
 class ProfilePageBody extends StatefulWidget {
   const ProfilePageBody({super.key});
@@ -25,6 +26,7 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
     super.initState();
     user = auth.getUserData();
   }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -55,7 +57,16 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                     ),
                   ),
                   SizedBox(height: 14),
-                  TextButton(onPressed: () {}, child: Text("Edit Profile")),
+                  TextButton(
+                    onPressed: () async {
+                      await Navigator.pushNamed(context, "/editProfile");
+                      await FirebaseAuth.instance.currentUser?.reload();
+                      setState(() {
+                        user = auth.getUserData();
+                      });
+                    },
+                    child: Text("Edit Profile"),
+                  ),
                 ],
               ),
             ),
