@@ -78,7 +78,6 @@ class Auth {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       User? user = _auth.currentUser;
-      log("[Log] ${user.toString()}");
       if (user != null) {
         await storeUserDataToFirestore(user);
       }
