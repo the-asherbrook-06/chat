@@ -1,5 +1,7 @@
 // packages
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hugeicons/hugeicons.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
 // auth
@@ -8,6 +10,9 @@ import '../auth/Auth.dart';
 // components
 import '../components/ProfilePicture.dart';
 import '../components/QuotesContainer.dart';
+
+// themes
+import '../themes/themeNotifier.dart';
 
 class ProfilePageBody extends StatefulWidget {
   const ProfilePageBody({super.key});
@@ -20,6 +25,49 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
   Auth auth = Auth();
   User? user;
 
+  void _showThemeSwitcher(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Choose Theme", style: Theme.of(context).textTheme.headlineSmall),
+              SizedBox(height: 24),
+              ListTile(
+                leading: Icon(HugeIcons.strokeRoundedSun02),
+                title: Text("Light Theme"),
+                onTap: () {
+                  Provider.of<ThemeNotifier>(context, listen: false).setTheme(ThemeMode.light);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(HugeIcons.strokeRoundedMoon01),
+                title: Text("Dark Theme"),
+                onTap: () {
+                  Provider.of<ThemeNotifier>(context, listen: false).setTheme(ThemeMode.dark);
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(HugeIcons.strokeRoundedDarkMode),
+                title: Text("System Default"),
+                onTap: () {
+                  Provider.of<ThemeNotifier>(context, listen: false).setTheme(ThemeMode.system);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -28,6 +76,19 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
 
   @override
   Widget build(BuildContext context) {
+    final themeMode = Provider.of<ThemeNotifier>(context).themeMode;
+
+    String getThemeLabel(ThemeMode mode) {
+      switch (mode) {
+        case ThemeMode.light:
+          return "Light";
+        case ThemeMode.dark:
+          return "Dark";
+        case ThemeMode.system:
+          return "System";
+      }
+    }
+
     return Padding(
       padding: const EdgeInsets.all(8),
       child: ListView(
@@ -77,6 +138,47 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
           ),
           SizedBox(height: 4),
           QuotesContainer(),
+          SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Settings", style: Theme.of(context).textTheme.headlineMedium),
+                  Divider(),
+                  ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Theme", style: Theme.of(context).textTheme.bodyLarge),
+                        Row(
+                          children: [
+                            Text(
+                              getThemeLabel(themeMode),
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(
+                              HugeIcons.strokeRoundedArrowRight01,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    onTap: () => _showThemeSwitcher(context),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

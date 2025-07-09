@@ -24,6 +24,7 @@ class _ChatPageBodyState extends State<ChatPageBody> {
         Padding(
           padding: const EdgeInsets.all(8),
           child: SearchBar(
+            elevation: WidgetStatePropertyAll(1),
             hintText: "Search",
             leading: Icon(Icons.search),
             shape: WidgetStatePropertyAll(

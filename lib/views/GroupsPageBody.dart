@@ -23,6 +23,7 @@ class _GroupsPageBodyState extends State<GroupsPageBody> {
         Padding(
           padding: const EdgeInsets.all(8),
           child: SearchBar(
+            elevation: WidgetStatePropertyAll(1),
             hintText: 'Search',
             shape: WidgetStatePropertyAll(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
