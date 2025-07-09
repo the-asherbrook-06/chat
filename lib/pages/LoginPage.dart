@@ -72,8 +72,8 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: passwordObsure,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) return 'Password is required';
-                  if (passwordController.text.length < 4 || passwordController.text.length > 16)
-                    return 'Password length should be bwtween 4 to 16';
+                  if (passwordController.text.length < 6 || passwordController.text.length > 16)
+                    return 'Password length should be between 6 to 16';
                   return null;
                 },
                 decoration: InputDecoration(
