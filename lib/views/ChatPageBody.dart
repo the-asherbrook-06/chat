@@ -18,23 +18,45 @@ class _ChatPageBodyState extends State<ChatPageBody> {
     final theme = (View.of(context).platformDispatcher.platformBrightness == Brightness.light)
         ? "light"
         : "dark";
-    return (_chats.isEmpty)
-        ? Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SvgPicture.asset("assets/$theme/begin_chat.svg", width: 220),
-                SizedBox(height: 24),
-                Text("All quiet... for now", style: Theme.of(context).textTheme.headlineSmall),
-                SizedBox(height: 4),
-                Text(
-                  "Start a chat to see messages here",
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
-                SizedBox(height: 24),
-              ],
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8),
+          child: SearchBar(
+            hintText: "Search",
+            leading: Icon(Icons.search),
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
-          )
-        : ListView(children: []);
+          ),
+        ),
+        Expanded(
+          child: _chats.isEmpty
+              ? Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(child: SizedBox()),
+                    SvgPicture.asset("assets/$theme/begin_chat.svg", width: 220),
+                    SizedBox(height: 24),
+                    Text("All quiet... for now", style: Theme.of(context).textTheme.headlineSmall),
+                    SizedBox(height: 4),
+                    Text(
+                      "Start a chat to see messages here",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    Expanded(child: SizedBox()),
+                  ],
+                )
+              : ListView.builder(
+                  itemCount: _chats.length,
+                  itemBuilder: (context, index) {
+                    final chat = _chats[index];
+                    return ListTile(title: Text(chat.name), subtitle: Text(chat.lastMessage));
+                  },
+                ),
+        ),
+      ],
+    );
   }
 }
