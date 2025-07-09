@@ -36,7 +36,12 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
           Container(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainer,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(14),
+                topRight: Radius.circular(14),
+                bottomLeft: Radius.circular(4),
+                bottomRight: Radius.circular(4),
+              ),
             ),
             child: Padding(
               padding: const EdgeInsets.all(12),

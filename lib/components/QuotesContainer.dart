@@ -31,7 +31,12 @@ class _QuotesContainerState extends State<QuotesContainer> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(4),
+          topRight: Radius.circular(4),
+          bottomLeft: Radius.circular(14),
+          bottomRight: Radius.circular(14),
+        ),
         color: Theme.of(context).colorScheme.surfaceContainer,
       ),
       child: Padding(
