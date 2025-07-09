@@ -22,6 +22,9 @@ class Auth {
       await user.updateDisplayName(name);
       await user.reload();
       log("[Auth] Display name updated to: ${user.displayName}");
+
+      // Update Firestore
+      await storeUserDataToFirestore(user);
     } else {
       log("[Auth] No user is signed in to update name.");
     }
@@ -45,6 +48,9 @@ class Auth {
     await user.updatePhotoURL(downloadUrl);
     await user.reload();
     log("[Auth] Profile picture updated: $downloadUrl");
+
+    // Update Firestore
+    await storeUserDataToFirestore(user);
   }
 
   Future<void> register(BuildContext context, String name, String email, String password) async {
@@ -56,6 +62,7 @@ class Auth {
       await userCredential.user!.updateDisplayName(name);
       await userCredential.user!.reload();
       User? user = _auth.currentUser;
+
       if (user != null) {
         await storeUserDataToFirestore(user);
       }
@@ -71,6 +78,7 @@ class Auth {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       User? user = _auth.currentUser;
+      log("[Log] ${user.toString()}");
       if (user != null) {
         await storeUserDataToFirestore(user);
       }
@@ -100,21 +108,35 @@ class Auth {
 
   Future<void> storeUserDataToFirestore(User user) async {
     final userDoc = _firestore.collection('users').doc(user.uid);
+    final snapshot = await userDoc.get();
 
-    final docSnapshot = await userDoc.get();
-    if (!docSnapshot.exists) {
-      await userDoc.set({
-        'uid': user.uid,
-        'email': user.email?.toLowerCase(),
-        'name': user.displayName ?? '',
-        'profilePic': user.photoURL ?? '',
-        'status': 'online',
-        'lastSeen': FieldValue.serverTimestamp(),
-        'chatRooms': [],
-      });
+    final data = {
+      'uid': user.uid,
+      'email': user.email?.toLowerCase(),
+      'name': user.displayName ?? '',
+      'profilePic': user.photoURL ?? '',
+      'lastSeen': FieldValue.serverTimestamp(),
+    };
+
+    if (!snapshot.exists) {
+      await userDoc.set({...data, 'chatRooms': []});
       log("[Firestore] User data created for ${user.email}");
     } else {
-      log("[Firestore] User data already exists for ${user.email}");
+      // Check what has changed and update only if necessary
+      Map<String, dynamic> updates = {};
+      final existingData = snapshot.data()!;
+      data.forEach((key, value) {
+        if (existingData[key] != value && value != null) {
+          updates[key] = value;
+        }
+      });
+
+      if (updates.isNotEmpty) {
+        await userDoc.update(updates);
+        log("[Firestore] User data updated: $updates");
+      } else {
+        log("[Firestore] No changes detected for ${user.email}");
+      }
     }
   }
 }
