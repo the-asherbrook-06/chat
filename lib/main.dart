@@ -1,5 +1,5 @@
 // packages
-import 'package:chat/pages/EditProfilePage.dart';
+import 'package:chat/screens/EditProfilePage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'firebase_options.dart';
 
 // pages
-import 'pages/SplashPage.dart';
-import 'pages/WelcomePage.dart';
-import 'pages/RegisterPage.dart';
-import 'pages/LoginPage.dart';
-import 'pages/Dashboard.dart';
+import 'screens/SplashPage.dart';
+import 'screens/WelcomePage.dart';
+import 'screens/RegisterPage.dart';
+import 'screens/LoginPage.dart';
+import 'screens/Dashboard.dart';
 
 // themes
 import 'themes/themeNotifier.dart';

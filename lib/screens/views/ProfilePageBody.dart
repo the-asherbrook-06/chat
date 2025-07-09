@@ -5,14 +5,14 @@ import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
 
 // auth
-import '../auth/Auth.dart';
+import '../../auth/Auth.dart';
 
 // components
-import '../components/ProfilePicture.dart';
-import '../components/QuotesContainer.dart';
+import '../../components/ProfilePicture.dart';
+import '../../components/QuotesContainer.dart';
 
 // themes
-import '../themes/themeNotifier.dart';
+import '../../themes/themeNotifier.dart';
 
 class ProfilePageBody extends StatefulWidget {
   const ProfilePageBody({super.key});
