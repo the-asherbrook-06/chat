@@ -1,5 +1,6 @@
 // packages
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'dart:developer';
 import 'dart:io';
 
 class Auth {
+  final _firestore = FirebaseFirestore.instance;
   final _storage = FirebaseStorage.instance;
   final _auth = FirebaseAuth.instance;
 
@@ -53,6 +55,10 @@ class Auth {
       );
       await userCredential.user!.updateDisplayName(name);
       await userCredential.user!.reload();
+      User? user = _auth.currentUser;
+      if (user != null) {
+        await storeUserDataToFirestore(user);
+      }
 
       log("[Auth] User registered and displayName set: ${_auth.currentUser?.displayName}");
       Navigator.pushNamedAndRemoveUntil(context, "/dashboard", (context) => false);
@@ -64,6 +70,11 @@ class Auth {
   Future<void> login(BuildContext context, String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      User? user = _auth.currentUser;
+      if (user != null) {
+        await storeUserDataToFirestore(user);
+      }
+
       log("[Auth] User logged in successfully!");
       Navigator.pushNamedAndRemoveUntil(context, "/dashboard", (context) => false);
     } catch (e) {
@@ -84,6 +95,26 @@ class Auth {
       Navigator.pushNamedAndRemoveUntil(context, "/dashboard", (context) => false);
     } else {
       log("[Auth] No user logged in.");
+    }
+  }
+
+  Future<void> storeUserDataToFirestore(User user) async {
+    final userDoc = _firestore.collection('users').doc(user.uid);
+
+    final docSnapshot = await userDoc.get();
+    if (!docSnapshot.exists) {
+      await userDoc.set({
+        'uid': user.uid,
+        'email': user.email?.toLowerCase(),
+        'name': user.displayName ?? '',
+        'profilePic': user.photoURL ?? '',
+        'status': 'online',
+        'lastSeen': FieldValue.serverTimestamp(),
+        'chatRooms': [],
+      });
+      log("[Firestore] User data created for ${user.email}");
+    } else {
+      log("[Firestore] User data already exists for ${user.email}");
     }
   }
 }
