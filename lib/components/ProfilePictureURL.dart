@@ -1,12 +1,11 @@
 // packages
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
-class ProfilePicture extends StatelessWidget {
-  const ProfilePicture({super.key, required this.user, required this.radius});
+class ProfilePictureURL extends StatelessWidget {
+  const ProfilePictureURL({super.key, required this.URL, required this.radius});
 
-  final User? user;
+  final String URL;
   final double radius;
 
   @override
@@ -18,13 +17,13 @@ class ProfilePicture extends StatelessWidget {
         width: radius * 2,
         color: Theme.of(context).colorScheme.surfaceContainerHighest,
         child: Center(
-          child: (user?.photoURL == null || user?.photoURL == '')
+          child: (URL == '' || URL.isEmpty)
               ? Icon(
                   HugeIcons.strokeRoundedUser,
                   color: Theme.of(context).colorScheme.onSurface,
                   size: radius,
                 )
-              : Image.network(user!.photoURL ?? "", fit: BoxFit.cover),
+              : Image.network(URL, fit: BoxFit.cover),
         ),
       ),
     );

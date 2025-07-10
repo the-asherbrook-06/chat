@@ -1,5 +1,4 @@
 // packages
-import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
 class ChatsPageAppBar extends StatelessWidget implements PreferredSizeWidget {
@@ -13,10 +12,6 @@ class ChatsPageAppBar extends StatelessWidget implements PreferredSizeWidget {
     return AppBar(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       title: Text("Chats"),
-      actions: [
-        IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedPencilEdit02)),
-        IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedMoreVerticalCircle01)),
-      ],
     );
   }
 }

@@ -12,6 +12,8 @@ import 'screens/WelcomePage.dart';
 import 'screens/RegisterPage.dart';
 import 'screens/LoginPage.dart';
 import 'screens/Dashboard.dart';
+import 'screens/NewChatPage.dart';
+import 'screens/ChatRoomPage.dart';
 
 // themes
 import 'themes/themeNotifier.dart';
@@ -52,6 +54,11 @@ class Chat extends StatelessWidget {
         '/login': (context) => const LoginPage(),
         '/dashboard': (context) => const Dashboard(),
         '/editProfile': (context) => const EditProfilePage(),
+        '/newChat': (context) => const NewChatPage(),
+        '/chatRoom': (context) {
+          final chatId = ModalRoute.of(context)!.settings.arguments as String;
+          return ChatRoomPage(chatRoomId: chatId);
+        },
       },
     );
   }

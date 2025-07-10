@@ -1,8 +1,7 @@
 // packages
-import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
-class GroupsPageAppBar extends StatelessWidget implements PreferredSizeWidget{
+class GroupsPageAppBar extends StatelessWidget implements PreferredSizeWidget {
   const GroupsPageAppBar({super.key});
 
   @override
@@ -11,12 +10,8 @@ class GroupsPageAppBar extends StatelessWidget implements PreferredSizeWidget{
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-        title: Text("Groups"),
-        actions: [
-          IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedPencilEdit02)),
-          IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedMoreVerticalCircle01)),
-        ],
-      );
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+      title: Text("Groups"),
+    );
   }
 }
