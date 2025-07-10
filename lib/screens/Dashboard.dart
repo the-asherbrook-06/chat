@@ -1,13 +1,13 @@
 // packages
-import 'package:chat/screens/appbars/ChatsPageAppBar.dart';
-import 'package:chat/screens/appbars/GroupsPageAppBar.dart';
-import 'package:chat/screens/appbars/ProfilePageAppBar.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
+// appbars
+import 'package:chat/screens/appbars/ChatsPageAppBar.dart';
+import 'package:chat/screens/appbars/ProfilePageAppBar.dart';
+
 // body
 import 'views/ProfilePageBody.dart';
-import 'views/GroupsPageBody.dart';
 import 'views/ChatPageBody.dart';
 
 class Dashboard extends StatefulWidget {
@@ -19,8 +19,8 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   int currentIndex = 0;
-  final List<Widget> _views = [ChatPageBody(), GroupsPageBody(), ProfilePageBody()];
-  final List<PreferredSizeWidget> _appBars = [ChatsPageAppBar(), GroupsPageAppBar(), ProfilePageAppBar()];
+  final List<Widget> _views = [ChatPageBody(), ProfilePageBody()];
+  final List<PreferredSizeWidget> _appBars = [ChatsPageAppBar(), ProfilePageAppBar()];
 
   void updateIndex(int index) {
     setState(() {
@@ -39,8 +39,7 @@ class _DashboardState extends State<Dashboard> {
         showUnselectedLabels: false,
         items: [
           BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedComment01), label: "chat"),
-          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUserGroup02), label: "group"),
-          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUser02), label: "group"),
+          BottomNavigationBarItem(icon: Icon(HugeIcons.strokeRoundedUser02), label: "profile"),
         ],
       ),
       body: _views[currentIndex],

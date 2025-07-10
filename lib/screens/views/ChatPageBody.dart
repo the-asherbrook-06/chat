@@ -2,10 +2,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:svg_flutter/svg_flutter.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
+import 'dart:developer';
 
 // models
-import 'package:chat/models/chatroomModel.dart';
+import 'package:chat/models/RoomModel.dart';
 
 // components
 import 'package:chat/components/ProfilePictureURL.dart';
@@ -44,16 +46,12 @@ class _ChatPageBodyState extends State<ChatPageBody> {
           padding: const EdgeInsets.all(8),
           child: SearchBar(
             controller: _searchController,
-            hintText: "Search",
+            hintText: "Search chats",
             elevation: const WidgetStatePropertyAll(1),
             trailing: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
             shape: WidgetStatePropertyAll(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
-            onTap: () {
-              FocusScope.of(context).requestFocus(FocusNode());
-              Navigator.pushNamed(context, '/newChat');
-            },
           ),
         ),
         Expanded(
@@ -85,7 +83,7 @@ class _ChatPageBodyState extends State<ChatPageBody> {
               }
 
               final allChats = snapshot.data!.docs
-                  .map((doc) => ChatRoom.fromMap(doc.id, doc.data() as Map<String, dynamic>))
+                  .map((doc) => Room.fromMap(doc.id, doc.data() as Map<String, dynamic>))
                   .where(
                     (chat) => _searchTerm.isEmpty || chat.id.toLowerCase().contains(_searchTerm),
                   )
@@ -97,18 +95,33 @@ class _ChatPageBodyState extends State<ChatPageBody> {
                   final chat = allChats[index];
                   final otherUserIds = chat.members.where((id) => id != currentUserId).toList();
 
-                  return FutureBuilder<DocumentSnapshot>(
-                    future: FirebaseFirestore.instance
-                        .collection('users')
-                        .doc(otherUserIds.first)
-                        .get(),
+                  return FutureBuilder<List<DocumentSnapshot>>(
+                    future: Future.wait(
+                      otherUserIds.map(
+                        (id) => FirebaseFirestore.instance.collection('users').doc(id).get(),
+                      ),
+                    ),
                     builder: (context, userSnapshot) {
                       if (!userSnapshot.hasData) return SizedBox.shrink();
 
-                      final userData = userSnapshot.data!.data() as Map<String, dynamic>;
+                      final userDocs = userSnapshot.data!;
+                      final memberNames = userDocs.map((doc) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        return data['name'] ?? data['email'] ?? 'Unknown';
+                      }).toList();
+
+                      final displayName = chat.nickname.isNotEmpty
+                          ? chat.nickname
+                          : memberNames.join(', ');
+
                       return ListTile(
-                        leading: ProfilePictureURL(URL: userData['profilePic'], radius: 28),
-                        title: Text(userData['name'] ?? userData['email']),
+                        // TODO: change custom group profile url
+                        leading: ProfilePictureURL(
+                          type: chat.type,
+                          URL: (userDocs.first.data() as Map<String, dynamic>)['profilePic'],
+                          radius: 28,
+                        ),
+                        title: Text(displayName),
                         subtitle: Text(
                           chat.lastMessageText ?? "New Chat",
                           style: TextStyle(
@@ -120,15 +133,22 @@ class _ChatPageBodyState extends State<ChatPageBody> {
                                 : Theme.of(context).textTheme.bodyMedium!.color,
                           ),
                         ),
-
-                        trailing: Icon(
-                          Icons.chat,
-                          color: (chat.lastMessageText == null || chat.lastMessageText == "")
-                              ? Theme.of(context).colorScheme.primary
-                              : Theme.of(context).colorScheme.onSurface,
+                        onLongPress: () {
+                          log("Long Pressed");
+                        },
+                        trailing: IconButton(
+                          onPressed: () {},
+                          icon: Icon(HugeIcons.strokeRoundedMoreVertical),
                         ),
                         onTap: () {
-                          Navigator.pushNamed(context, '/chatRoom', arguments: chat.id);
+                          switch (chat.type) {
+                            case 'chat':
+                              Navigator.pushNamed(context, '/chatRoom', arguments: chat.id);
+                              break;
+                            case 'group':
+                              Navigator.pushNamed(context, '/groupRoom', arguments: chat.id);
+                              break;
+                          }
                         },
                       );
                     },

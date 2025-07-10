@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import '../../auth/Auth.dart';
 
 // components
-import '../../components/ProfilePicture.dart';
+import '../../components/ProfilePictureURL.dart';
 import '../../components/QuotesContainer.dart';
 
 // themes
@@ -108,7 +108,7 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
               padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
-                  ProfilePicture(user: user, radius: 60),
+                  ProfilePictureURL(type: 'profile', URL: user?.photoURL ?? "", radius: 60),
                   SizedBox(height: 16),
                   Text(
                     user?.displayName ?? "",

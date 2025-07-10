@@ -5,17 +5,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
-class NewChatPage extends StatefulWidget {
-  const NewChatPage({super.key});
+class NewGroupPage extends StatefulWidget {
+  const NewGroupPage({super.key});
 
   @override
-  State<NewChatPage> createState() => _NewChatPageState();
+  State<NewGroupPage> createState() => _NewGroupPageState();
 }
 
-class _NewChatPageState extends State<NewChatPage> {
+class _NewGroupPageState extends State<NewGroupPage> {
   final TextEditingController _searchController = TextEditingController();
+  final List<Map<String, dynamic>> _selectedUsers = [];
   List<Map<String, dynamic>> _results = [];
-  Map<String, dynamic>? _selectedUser;
   bool _isLoading = false;
 
   void searchUsers() async {
@@ -50,18 +50,23 @@ class _NewChatPageState extends State<NewChatPage> {
     });
   }
 
-  Future<void> startChat() async {
-    if (_selectedUser == null) return;
+  Future<void> createGroup() async {
     final currentUser = FirebaseAuth.instance.currentUser!;
-    final members = [currentUser.uid, _selectedUser!['id']]..sort();
+    final memberIds = [currentUser.uid, ..._selectedUsers.map((u) => u['id'])]..sort();
 
     final chatDoc = FirebaseFirestore.instance.collection('chatRooms').doc();
     final chatId = chatDoc.id;
 
-    await chatDoc.set({'type': 'chat', 'members': members, 'lastMessage': null, 'nickname': ''});
+    await chatDoc.set({
+      'type': 'group',
+      'members': memberIds,
+      'lastMessage': null,
+      'nickname': '',
+      'profileImage': '',
+    });
 
     Navigator.popUntil(context, ModalRoute.withName('/dashboard'));
-    Navigator.pushNamed(context, '/chatRoom', arguments: chatId);
+    Navigator.pushNamed(context, '/groupRoom', arguments: chatId);
   }
 
   @override
@@ -74,15 +79,15 @@ class _NewChatPageState extends State<NewChatPage> {
           },
           icon: Icon(HugeIcons.strokeRoundedArrowLeft01),
         ),
-        title: Text("New Chat"),
+        title: Text("New Group"),
       ),
-      floatingActionButton: _selectedUser != null
+      floatingActionButton: _selectedUsers.length >= 2
           ? FloatingActionButton.extended(
               backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-              onPressed: startChat,
+              onPressed: createGroup,
               icon: Icon(HugeIcons.strokeRoundedSent02),
-              label: Text("Start Chat"),
+              label: Text("Create Group"),
             )
           : null,
       body: Padding(
@@ -99,21 +104,28 @@ class _NewChatPageState extends State<NewChatPage> {
               trailing: [IconButton(icon: Icon(Icons.search), onPressed: searchUsers)],
               onSubmitted: (_) => searchUsers(),
             ),
-            if (_selectedUser != null)
+            if (_selectedUsers.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
-                child: Chip(
-                  label: Text(_selectedUser!['username']),
-                  avatar: ProfilePictureURL(
-                    type: 'chat',
-                    URL: _selectedUser!['profilePic'] ?? '',
-                    radius: 14,
-                  ),
-                  onDeleted: () {
-                    setState(() {
-                      _selectedUser = null;
-                    });
-                  },
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: -8,
+                  children: _selectedUsers.map((user) {
+                    return Chip(
+                      label: Text(user['username']),
+                      avatar: ProfilePictureURL(
+                        type: 'chat',
+                        URL: user['profilePic'] ?? '',
+                        radius: 14,
+                      ),
+                      // avatar: CircleAvatar(backgroundImage: NetworkImage(user['profilePic'] ?? '')),
+                      onDeleted: () {
+                        setState(() {
+                          _selectedUsers.removeWhere((u) => u['id'] == user['id']);
+                        });
+                      },
+                    );
+                  }).toList(),
                 ),
               ),
             const SizedBox(height: 24),
@@ -133,11 +145,16 @@ class _NewChatPageState extends State<NewChatPage> {
                       subtitle: Text(user['email']),
                       trailing: Icon(HugeIcons.strokeRoundedComment01),
                       onTap: () {
+                        final alreadySelected = _selectedUsers.any((u) => u['id'] == user['id']);
                         setState(() {
-                          _selectedUser = user; // Replace the selected user
+                          if (alreadySelected) {
+                            _selectedUsers.removeWhere((u) => u['id'] == user['id']);
+                          } else {
+                            _selectedUsers.add(user);
+                          }
                         });
                       },
-                      selected: _selectedUser?['id'] == user['id'],
+                      selected: _selectedUsers.any((u) => u['id'] == user['id']),
                     );
                   },
                 ),

@@ -1,11 +1,13 @@
 // packages
-import 'package:chat/components/ProfilePicture.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 // auth
 import '../auth/Auth.dart';
+
+// components
+import '../../components/ProfilePictureURL.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -61,7 +63,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         user = auth.getUserData();
                       });
                     },
-                    icon: ProfilePicture(user: user, radius: 60),
+                    icon: ProfilePictureURL(type: "profile", URL: user?.photoURL ?? "", radius: 60),
                   ),
                 ],
               ),

@@ -8,17 +8,18 @@ import 'package:flutter/material.dart';
 // components
 import '../components/ProfilePictureURL.dart';
 
-class ChatRoomPage extends StatefulWidget {
+class GroupRoomPage extends StatefulWidget {
   final String chatRoomId;
-  const ChatRoomPage({super.key, required this.chatRoomId});
+  const GroupRoomPage({super.key, required this.chatRoomId});
 
   @override
-  State<ChatRoomPage> createState() => _ChatRoomPageState();
+  State<GroupRoomPage> createState() => _GroupRoomPageState();
 }
 
-class _ChatRoomPageState extends State<ChatRoomPage> {
+class _GroupRoomPageState extends State<GroupRoomPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  final Map<String, String> _userNameCache = {};
   String profilePicureURL = "";
   String otherUserId = "";
   String username = "";
@@ -45,20 +46,28 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         .get();
 
     if (chatDoc.exists && chatDoc.data()?['members'] != null) {
-      final List members = chatDoc.data()!['members'];
-      setState(() {
-        otherUserId = members.firstWhere((id) => id != currentUser.uid);
-      });
+      final data = chatDoc.data()!;
+      final List members = data['members'];
+      final String? nickname = data['nickname'];
 
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(otherUserId).get();
+      List<String> usernames = [];
 
-      if (userDoc.exists) {
-        setState(() {
-          profilePicureURL = userDoc.data()?['profilePic'] ?? '';
-          username = userDoc.data()?['name'] ?? '';
-          email = userDoc.data()?['email'] ?? '';
-        });
+      for (final id in members) {
+        if (id == currentUser.uid) continue;
+        final userDoc = await FirebaseFirestore.instance.collection('users').doc(id).get();
+        if (userDoc.exists) {
+          if (otherUserId.isEmpty) {
+            profilePicureURL = userDoc.data()?['profilePic'] ?? '';
+            otherUserId = id;
+          }
+          usernames.add(userDoc.data()?['name'] ?? '');
+        }
       }
+
+      setState(() {
+        username = (nickname != null && nickname.isNotEmpty) ? nickname : usernames.join(', ');
+        email = '';
+      });
     }
   }
 
@@ -81,6 +90,17 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     });
 
     _messageController.clear();
+  }
+
+  Future<String> getSenderName(String uid) async {
+    if (_userNameCache.containsKey(uid)) {
+      return _userNameCache[uid]!;
+    }
+
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
+    final name = userDoc.data()?['name'] ?? 'Unknown';
+    _userNameCache[uid] = name;
+    return name;
   }
 
   void setTyping(bool isTyping) {
@@ -109,19 +129,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         titleSpacing: 0,
         title: Row(
           children: [
-            // TODO: change type
             // TODO: change custom group profile url
-            ProfilePictureURL(type: "chat", URL: profilePicureURL, radius: 24),
+            ProfilePictureURL(type: "group", URL: profilePicureURL, radius: 24),
             SizedBox(width: 12),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  username.isNotEmpty ? username : "Loading...",
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                Text(email, style: Theme.of(context).textTheme.labelMedium),
-              ],
+            Text(
+              username.isNotEmpty ? username : "Loading...",
+              style: Theme.of(context).textTheme.bodyLarge,
             ),
           ],
         ),
@@ -161,26 +174,104 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 return ListView(
                   controller: _scrollController,
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  children: snapshot.data!.docs.map((doc) {
+                  // inside ListView children:
+                  children: List.generate(snapshot.data!.docs.length, (index) {
+                    final doc = snapshot.data!.docs[index];
                     final data = doc.data() as Map<String, dynamic>;
-                    final isMe = data['senderId'] == currentUserId;
+                    final senderId = data['senderId'];
                     final text = data['text'] ?? '';
+                    final isMe = senderId == currentUserId;
 
-                    return Align(
-                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: isMe
-                              ? Theme.of(context).colorScheme.primaryContainer
-                              : Theme.of(context).colorScheme.secondaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
-                      ),
+                    final previousSenderId = index > 0
+                        ? (snapshot.data!.docs[index - 1].data()
+                              as Map<String, dynamic>)['senderId']
+                        : null;
+
+                    final showHeader = !isMe && senderId != previousSenderId;
+
+                    return FutureBuilder<String>(
+                      future: getSenderName(senderId),
+                      builder: (context, nameSnapshot) {
+                        final senderName = nameSnapshot.connectionState == ConnectionState.done
+                            ? nameSnapshot.data ?? 'Unknown'
+                            : '';
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: isMe
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
+                            children: [
+                              if (!isMe && showHeader) ...[
+                                FutureBuilder<DocumentSnapshot>(
+                                  future: FirebaseFirestore.instance
+                                      .collection('users')
+                                      .doc(senderId)
+                                      .get(),
+                                  builder: (context, userSnapshot) {
+                                    final profilePicUrl = userSnapshot.data?.data() != null
+                                        ? (userSnapshot.data!.data()
+                                                  as Map<String, dynamic>)['profilePic'] ??
+                                              ''
+                                        : '';
+
+                                    return ProfilePictureURL(
+                                      type: 'user',
+                                      URL: profilePicUrl,
+                                      radius: 16,
+                                    );
+                                  },
+                                ),
+                                SizedBox(width: 8),
+                              ] else if (!isMe) ...[
+                                SizedBox(
+                                  width: 40,
+                                ),
+                              ],
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: isMe
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
+                                  children: [
+                                    if (showHeader && senderName.isNotEmpty && !isMe)
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 2),
+                                        child: Text(
+                                          senderName,
+                                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ),
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(vertical: 2),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: isMe
+                                            ? Theme.of(context).colorScheme.primaryContainer
+                                            : Theme.of(context).colorScheme.secondaryContainer,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        text,
+                                        style: Theme.of(context).textTheme.bodyMedium,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     );
-                  }).toList(),
+                  }),
                 );
               },
             ),

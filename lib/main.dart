@@ -1,9 +1,10 @@
 // packages
-import 'package:chat/screens/EditProfilePage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+
+// config
 import 'firebase_options.dart';
 
 // pages
@@ -13,7 +14,10 @@ import 'screens/RegisterPage.dart';
 import 'screens/LoginPage.dart';
 import 'screens/Dashboard.dart';
 import 'screens/NewChatPage.dart';
+import 'screens/NewGroupPage.dart';
 import 'screens/ChatRoomPage.dart';
+import 'screens/GroupRoomPage.dart';
+import 'screens/EditProfilePage.dart';
 
 // themes
 import 'themes/themeNotifier.dart';
@@ -33,7 +37,6 @@ class Chat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final brightness = View.of(context).platformDispatcher.platformBrightness;
     final themeNotifier = Provider.of<ThemeNotifier>(context);
     TextTheme textTheme = createTextTheme(context, "Nunito Sans", "Nunito");
     MaterialTheme theme = MaterialTheme(textTheme);
@@ -55,9 +58,14 @@ class Chat extends StatelessWidget {
         '/dashboard': (context) => const Dashboard(),
         '/editProfile': (context) => const EditProfilePage(),
         '/newChat': (context) => const NewChatPage(),
+        '/newGroup': (context) => const NewGroupPage(),
         '/chatRoom': (context) {
           final chatId = ModalRoute.of(context)!.settings.arguments as String;
           return ChatRoomPage(chatRoomId: chatId);
+        },
+        '/groupRoom': (context) {
+          final chatId = ModalRoute.of(context)!.settings.arguments as String;
+          return GroupRoomPage(chatRoomId: chatId);
         },
       },
     );
