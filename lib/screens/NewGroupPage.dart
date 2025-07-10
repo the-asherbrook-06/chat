@@ -62,7 +62,7 @@ class _NewGroupPageState extends State<NewGroupPage> {
       'members': memberIds,
       'lastMessage': null,
       'nickname': '',
-      'profileImage': '',
+      'groupPic': '',
     });
 
     Navigator.popUntil(context, ModalRoute.withName('/dashboard'));

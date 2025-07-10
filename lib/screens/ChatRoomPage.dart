@@ -109,8 +109,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         titleSpacing: 0,
         title: Row(
           children: [
-            // TODO: change type
-            // TODO: change custom group profile url
             ProfilePictureURL(type: "chat", URL: profilePicureURL, radius: 24),
             SizedBox(width: 12),
             Column(

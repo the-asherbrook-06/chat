@@ -44,6 +44,7 @@ class _ChatPageBodyState extends State<ChatPageBody> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
+          // TODO: Modify the behaviour of SearchBar
           child: SearchBar(
             controller: _searchController,
             hintText: "Search chats",
@@ -115,10 +116,11 @@ class _ChatPageBodyState extends State<ChatPageBody> {
                           : memberNames.join(', ');
 
                       return ListTile(
-                        // TODO: change custom group profile url
                         leading: ProfilePictureURL(
                           type: chat.type,
-                          URL: (userDocs.first.data() as Map<String, dynamic>)['profilePic'],
+                          URL: chat.type == 'group'
+                              ? chat.groupPic
+                              : (userDocs.first.data() as Map<String, dynamic>)['profilePic'],
                           radius: 28,
                         ),
                         title: Text(displayName),

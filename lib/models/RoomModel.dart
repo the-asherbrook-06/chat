@@ -3,6 +3,7 @@ class Room {
   final String type;
   final List members;
   final String nickname;
+  final String groupPic;
   final String? lastMessageText;
   final String? lastSenderId;
 
@@ -11,6 +12,7 @@ class Room {
     required this.type,
     required this.members,
     required this.nickname,
+    required this.groupPic,
     this.lastMessageText,
     this.lastSenderId,
   });
@@ -21,6 +23,7 @@ class Room {
       type: data['type'],
       members: List<String>.from(data['members']),
       nickname: data['nickname'] ?? '',
+      groupPic: data['groupPic'] ?? '',
       lastMessageText: data['lastMessage']?['text'],
       lastSenderId: data['lastMessage']?['senderId'],
     );

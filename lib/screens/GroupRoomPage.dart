@@ -1,4 +1,6 @@
 // packages
+import 'dart:developer';
+
 import 'package:chat/components/TypingIndicator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -56,19 +58,18 @@ class _GroupRoomPageState extends State<GroupRoomPage> {
         if (id == currentUser.uid) continue;
         final userDoc = await FirebaseFirestore.instance.collection('users').doc(id).get();
         if (userDoc.exists) {
-          if (otherUserId.isEmpty) {
-            profilePicureURL = userDoc.data()?['profilePic'] ?? '';
-            otherUserId = id;
-          }
           usernames.add(userDoc.data()?['name'] ?? '');
         }
       }
 
       setState(() {
         username = (nickname != null && nickname.isNotEmpty) ? nickname : usernames.join(', ');
+        profilePicureURL = data['groupPic'] ?? '';
         email = '';
       });
     }
+
+    log(profilePicureURL);
   }
 
   Future<void> sendMessage() async {
@@ -129,7 +130,6 @@ class _GroupRoomPageState extends State<GroupRoomPage> {
         titleSpacing: 0,
         title: Row(
           children: [
-            // TODO: change custom group profile url
             ProfilePictureURL(type: "group", URL: profilePicureURL, radius: 24),
             SizedBox(width: 12),
             Text(
@@ -226,9 +226,7 @@ class _GroupRoomPageState extends State<GroupRoomPage> {
                                 ),
                                 SizedBox(width: 8),
                               ] else if (!isMe) ...[
-                                SizedBox(
-                                  width: 40,
-                                ),
+                                SizedBox(width: 40),
                               ],
                               Expanded(
                                 child: Column(
