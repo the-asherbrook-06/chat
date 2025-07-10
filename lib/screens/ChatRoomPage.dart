@@ -1,15 +1,249 @@
 // packages
+import 'package:chat/components/TypingIndicator.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
 
-class ChatRoomPage extends StatelessWidget {
+// components
+import '../components/ProfilePictureURL.dart';
+
+class ChatRoomPage extends StatefulWidget {
   final String chatRoomId;
   const ChatRoomPage({super.key, required this.chatRoomId});
 
   @override
+  State<ChatRoomPage> createState() => _ChatRoomPageState();
+}
+
+class _ChatRoomPageState extends State<ChatRoomPage> {
+  final TextEditingController _messageController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+  String profilePicureURL = "";
+  String otherUserId = "";
+  String username = "";
+  String email = "";
+
+  @override
+  void initState() {
+    super.initState();
+    fetchUserDetails();
+  }
+
+  @override
+  void dispose() {
+    setTyping(false);
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> fetchUserDetails() async {
+    final currentUser = FirebaseAuth.instance.currentUser!;
+    final chatDoc = await FirebaseFirestore.instance
+        .collection('chatRooms')
+        .doc(widget.chatRoomId)
+        .get();
+
+    if (chatDoc.exists && chatDoc.data()?['members'] != null) {
+      final List members = chatDoc.data()!['members'];
+      setState(() {
+        otherUserId = members.firstWhere((id) => id != currentUser.uid);
+        print("👤 Other user ID set: $otherUserId");
+      });
+
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(otherUserId).get();
+
+      if (userDoc.exists) {
+        setState(() {
+          profilePicureURL = userDoc.data()?['profilePic'] ?? '';
+          username = userDoc.data()?['name'] ?? '';
+          email = userDoc.data()?['email'] ?? '';
+          print("📨 User details fetched: $username, $email");
+        });
+      }
+    }
+  }
+
+  Future<void> sendMessage() async {
+    final message = _messageController.text.trim();
+    if (message.isEmpty) return;
+    setTyping(false);
+
+    final currentUser = FirebaseAuth.instance.currentUser!;
+    final timestamp = FieldValue.serverTimestamp();
+    final messageDoc = FirebaseFirestore.instance
+        .collection('chatRooms')
+        .doc(widget.chatRoomId)
+        .collection('messages')
+        .doc();
+
+    await messageDoc.set({'senderId': currentUser.uid, 'text': message, 'timestamp': timestamp});
+    await FirebaseFirestore.instance.collection('chatRooms').doc(widget.chatRoomId).update({
+      'lastMessage': {'text': message, 'timestamp': timestamp, 'senderId': currentUser.uid},
+    });
+
+    _messageController.clear();
+
+    Future.delayed(Duration(milliseconds: 100), () {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    });
+  }
+
+  void setTyping(bool isTyping) {
+    final currentUser = FirebaseAuth.instance.currentUser!;
+    print("⌨️ Setting typing status: $isTyping");
+    FirebaseFirestore.instance
+        .collection('chatRooms')
+        .doc(widget.chatRoomId)
+        .collection('typing')
+        .doc(currentUser.uid)
+        .set({'isTyping': isTyping});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final theme = (View.of(context).platformDispatcher.platformBrightness == Brightness.light)
+        ? "light"
+        : "dark";
+
     return Scaffold(
-      appBar: AppBar(title: Text("Chat")),
-      body: Center(child: Text("Chat room: $chatRoomId")),
+      resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        toolbarHeight: 64,
+        backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: Icon(HugeIcons.strokeRoundedArrowLeft01),
+        ),
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            ProfilePictureURL(URL: profilePicureURL, radius: 24),
+            SizedBox(width: 12),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  username.isNotEmpty ? username : "Loading...",
+                  style: Theme.of(context).textTheme.bodyLarge,
+                ),
+                Text(email, style: Theme.of(context).textTheme.labelMedium),
+              ],
+            ),
+          ],
+        ),
+        actions: [IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedMoreVertical))],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('chatRooms')
+                  .doc(widget.chatRoomId)
+                  .collection('messages')
+                  .orderBy('timestamp', descending: false)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(child: Text("No messages yet."));
+                }
+
+                final currentUserId = FirebaseAuth.instance.currentUser!.uid;
+
+                return ListView(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  children: snapshot.data!.docs.map((doc) {
+                    final data = doc.data() as Map<String, dynamic>;
+                    final isMe = data['senderId'] == currentUserId;
+                    final text = data['text'] ?? '';
+
+                    return Align(
+                      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                        decoration: BoxDecoration(
+                          color: isMe
+                              ? Theme.of(context).colorScheme.primaryContainer
+                              : Theme.of(context).colorScheme.secondaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+            ),
+          ),
+          if (otherUserId.isNotEmpty)
+            StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('chatRooms')
+                  .doc(widget.chatRoomId)
+                  .collection('typing')
+                  .doc(otherUserId)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData && snapshot.data!.data() != null) {
+                  final data = snapshot.data!.data() as Map<String, dynamic>;
+                  final isTyping = data['isTyping'] ?? false;
+                  print("📡 Received typing snapshot for $otherUserId: isTyping=$isTyping");
+                  if (isTyping) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.secondaryContainer,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: TypingIndicator(),
+                        ),
+                      ),
+                    );
+                  }
+                }
+                return SizedBox.shrink();
+              },
+            ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: SafeArea(
+              child: TextField(
+                controller: _messageController,
+                onChanged: (val) {
+                  print("📥 onChanged text: $val");
+                  setTyping(val.isNotEmpty);
+                },
+                onEditingComplete: () => setTyping(false),
+                decoration: InputDecoration(
+                  hintText: "Type a message...",
+                  suffixIcon: IconButton(
+                    onPressed: sendMessage,
+                    icon: Icon(HugeIcons.strokeRoundedSent02),
+                  ),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
