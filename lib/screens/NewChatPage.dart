@@ -62,10 +62,6 @@ class _NewChatPageState extends State<NewChatPage> {
       'lastMessage': null,
     }, SetOptions(merge: true));
 
-    await FirebaseFirestore.instance.collection('users').doc(currentUser.uid).update({
-      'chatRooms': FieldValue.arrayUnion([chatId]),
-    });
-
     Navigator.popUntil(context, ModalRoute.withName('/dashboard'));
     Navigator.pushNamed(context, '/chatRoom', arguments: chatId);
   }
