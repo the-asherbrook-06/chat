@@ -118,10 +118,9 @@ class Auth {
     };
 
     if (!snapshot.exists) {
-      await userDoc.set({...data, 'chatRooms': []});
+      await userDoc.set(data);
       log("[Firestore] User data created for ${user.email}");
     } else {
-      // Check what has changed and update only if necessary
       Map<String, dynamic> updates = {};
       final existingData = snapshot.data()!;
       data.forEach((key, value) {
