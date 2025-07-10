@@ -48,7 +48,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       final List members = chatDoc.data()!['members'];
       setState(() {
         otherUserId = members.firstWhere((id) => id != currentUser.uid);
-        print("👤 Other user ID set: $otherUserId");
       });
 
       final userDoc = await FirebaseFirestore.instance.collection('users').doc(otherUserId).get();
@@ -58,7 +57,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           profilePicureURL = userDoc.data()?['profilePic'] ?? '';
           username = userDoc.data()?['name'] ?? '';
           email = userDoc.data()?['email'] ?? '';
-          print("📨 User details fetched: $username, $email");
         });
       }
     }
@@ -95,7 +93,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   void setTyping(bool isTyping) {
     final currentUser = FirebaseAuth.instance.currentUser!;
-    print("⌨️ Setting typing status: $isTyping");
     FirebaseFirestore.instance
         .collection('chatRooms')
         .doc(widget.chatRoomId)
@@ -106,10 +103,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = (View.of(context).platformDispatcher.platformBrightness == Brightness.light)
-        ? "light"
-        : "dark";
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
@@ -200,7 +193,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 if (snapshot.hasData && snapshot.data!.data() != null) {
                   final data = snapshot.data!.data() as Map<String, dynamic>;
                   final isTyping = data['isTyping'] ?? false;
-                  print("📡 Received typing snapshot for $otherUserId: isTyping=$isTyping");
                   if (isTyping) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -227,7 +219,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               child: TextField(
                 controller: _messageController,
                 onChanged: (val) {
-                  print("📥 onChanged text: $val");
                   setTyping(val.isNotEmpty);
                 },
                 onEditingComplete: () => setTyping(false),
