@@ -123,7 +123,51 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             ),
           ],
         ),
-        actions: [IconButton(onPressed: () {}, icon: Icon(HugeIcons.strokeRoundedMoreVertical))],
+        actions: [
+          PopupMenuButton(
+            borderRadius: BorderRadius.circular(14),
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            icon: Icon(HugeIcons.strokeRoundedMoreVertical),
+            onSelected: (value) {
+              // TODO: Add Menu functionality
+            },
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'edit',
+                child: Row(
+                  children: [
+                    Icon(HugeIcons.strokeRoundedPen01),
+                    SizedBox(width: 12),
+                    Text("Edit Chat"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'clean',
+                child: Row(
+                  children: [
+                    Icon(HugeIcons.strokeRoundedClean),
+                    SizedBox(width: 12),
+                    Text("Clean History"),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'delete',
+                child: Row(
+                  children: [
+                    Icon(
+                      HugeIcons.strokeRoundedDelete01,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    SizedBox(width: 12),
+                    Text("Delete Chat"),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -175,6 +219,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               : Theme.of(context).colorScheme.secondaryContainer,
                           borderRadius: BorderRadius.circular(12),
                         ),
+                        // TODO: Add Read Recipts
                         child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
                       ),
                     );

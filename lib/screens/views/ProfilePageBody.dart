@@ -68,6 +68,41 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
     );
   }
 
+  void _showReadReceiptSwitcher(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Read Receipts", style: Theme.of(context).textTheme.headlineSmall),
+              SizedBox(height: 24),
+              ListTile(
+                leading: Icon(HugeIcons.strokeRoundedCheckmarkCircle02),
+                title: Text("Active"),
+                onTap: () {
+                  // TODO: Read Receipts Mode Active
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: Icon(HugeIcons.strokeRoundedCancelCircle),
+                title: Text("Disabled"),
+                onTap: () {
+                  // TODO: Read Receipts Mode Disabled
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -174,6 +209,31 @@ class _ProfilePageBodyState extends State<ProfilePageBody> {
                       ],
                     ),
                     onTap: () => _showThemeSwitcher(context),
+                  ),
+                  ListTile(
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Read Receipts", style: Theme.of(context).textTheme.bodyLarge),
+                        Row(
+                          children: [
+                            Text(
+                              // TODO: Set Variable for current Read Receipts Settings
+                              "Active",
+                              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                color: Theme.of(context).colorScheme.outline,
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                            Icon(
+                              HugeIcons.strokeRoundedArrowRight01,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    onTap: () => _showReadReceiptSwitcher(context),
                   ),
                 ],
               ),

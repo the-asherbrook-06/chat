@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:svg_flutter/svg_flutter.dart';
 import 'package:hugeicons/hugeicons.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer';
 
 // models
 import 'package:chat/models/RoomModel.dart';
@@ -115,6 +114,7 @@ class _ChatPageBodyState extends State<ChatPageBody> {
                           ? chat.nickname
                           : memberNames.join(', ');
 
+                      // TODO: Gestures for Delete Chat
                       return ListTile(
                         leading: ProfilePictureURL(
                           type: chat.type,
@@ -135,12 +135,40 @@ class _ChatPageBodyState extends State<ChatPageBody> {
                                 : Theme.of(context).textTheme.bodyMedium!.color,
                           ),
                         ),
-                        onLongPress: () {
-                          log("Long Pressed");
-                        },
-                        trailing: IconButton(
-                          onPressed: () {},
+                        trailing: PopupMenuButton(
+                          borderRadius: BorderRadius.circular(14),
+                          color: Theme.of(context).colorScheme.surfaceContainerHighest,
                           icon: Icon(HugeIcons.strokeRoundedMoreVertical),
+                          onSelected: (value) {
+                            // TODO: Add Menu functionality
+                          },
+                          itemBuilder: (context) => [
+                            PopupMenuItem(
+                              value: 'clear',
+                              child: Row(
+                                children: [
+                                  Icon(HugeIcons.strokeRoundedClean),
+                                  SizedBox(width: 12),
+                                  Text("Clear History"),
+                                ],
+                              ),
+                            ),
+                            PopupMenuItem(
+                              value: 'delete',
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    HugeIcons.strokeRoundedDelete01,
+                                    color: Theme.of(context).colorScheme.error,
+                                  ),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    (chat.type == 'chat')? "Delete Chat": "Delete Group"
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                         onTap: () {
                           switch (chat.type) {
