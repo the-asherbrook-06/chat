@@ -40,7 +40,7 @@ class ChatsPageAppBar extends StatelessWidget implements PreferredSizeWidget {
               value: 'group',
               child: Row(
                 children: [
-                  Icon(HugeIcons.strokeRoundedUserGroup),
+                  Icon(HugeIcons.strokeRoundedUserGroup02),
                   SizedBox(width: 12),
                   Text("New Group"),
                 ],
