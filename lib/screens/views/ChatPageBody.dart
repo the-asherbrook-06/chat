@@ -43,12 +43,11 @@ class _ChatPageBodyState extends State<ChatPageBody> {
       children: [
         Padding(
           padding: const EdgeInsets.all(8),
-          // TODO: Modify the behaviour of SearchBar
           child: SearchBar(
             controller: _searchController,
             hintText: "Search chats",
             elevation: const WidgetStatePropertyAll(1),
-            trailing: [IconButton(icon: const Icon(Icons.search), onPressed: () {})],
+            trailing: [Padding(padding: const EdgeInsets.all(12), child: Icon(Icons.search))],
             shape: WidgetStatePropertyAll(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
@@ -84,9 +83,6 @@ class _ChatPageBodyState extends State<ChatPageBody> {
 
               final allChats = snapshot.data!.docs
                   .map((doc) => Room.fromMap(doc.id, doc.data() as Map<String, dynamic>))
-                  .where(
-                    (chat) => _searchTerm.isEmpty || chat.id.toLowerCase().contains(_searchTerm),
-                  )
                   .toList();
 
               return ListView.builder(
@@ -102,17 +98,24 @@ class _ChatPageBodyState extends State<ChatPageBody> {
                       ),
                     ),
                     builder: (context, userSnapshot) {
-                      if (!userSnapshot.hasData) return SizedBox.shrink();
+                      if (!userSnapshot.hasData) return const SizedBox.shrink();
 
                       final userDocs = userSnapshot.data!;
                       final memberNames = userDocs.map((doc) {
                         final data = doc.data() as Map<String, dynamic>;
-                        return data['name'] ?? data['email'] ?? 'Unknown';
+                        return (data['name'] ?? data['email'] ?? 'Unknown').toString();
                       }).toList();
 
                       final displayName = chat.nickname.isNotEmpty
                           ? chat.nickname
                           : memberNames.join(', ');
+
+                      final matchesSearch =
+                          _searchTerm.isEmpty ||
+                          displayName.toLowerCase().contains(_searchTerm) ||
+                          memberNames.any((name) => name.toLowerCase().contains(_searchTerm));
+
+                      if (!matchesSearch) return const SizedBox.shrink();
 
                       // TODO: Gestures for Delete Chat
                       return ListTile(
@@ -162,9 +165,7 @@ class _ChatPageBodyState extends State<ChatPageBody> {
                                     color: Theme.of(context).colorScheme.error,
                                   ),
                                   SizedBox(width: 12),
-                                  Text(
-                                    (chat.type == 'chat')? "Delete Chat": "Delete Group"
-                                    ),
+                                  Text((chat.type == 'chat') ? "Delete Chat" : "Delete Group"),
                                 ],
                               ),
                             ),
